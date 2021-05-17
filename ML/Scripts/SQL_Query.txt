@@ -1,0 +1,41 @@
+CREATE TABLE s2244314.weather_monthly AS
+SELECT stn,
+       date_trunc('month',a.yyyymmdd) as dates,
+       AVG(a.tn) as min_temp,
+	   AVG(a.tx) as max_temp,
+	   AVG(a.rh) as preci,
+	   AVG(a.ug) as rel_hum,
+	   AVG(a.ev24) as evapo
+	   
+	   
+FROM weather_data as a
+GROUP BY stn, dates
+ORDER BY stn, dates;
+
+
+
+CREATE TABLE s2244314.weather_data
+(
+	STN	integer,
+	YYYYMMDD timestamp,
+	TN decimal,
+	TX decimal,
+	RH decimal,
+	UG decimal,
+	EV24 decimal
+);
+
+
+CREATE TABLE s2244314.nymph_monthly AS
+SELECT location,
+       date_trunc('month',a.date) as dates,
+       SUM(a.nymph) as monthly_count_nymph
+	   
+FROM nymph_count as a
+GROUP BY location, dates
+ORDER BY location, dates, monthly_count_nymph;
+
+CREATE TABLE s2244314.training_data AS
+SELECT a.stn, a.dates as time, a.min_temp as min_temp, a.max_temp as max_temp,a.preci as preci,a.rel_hum as rel_hum,a.evapo as evapo,r.monthly_count_nymph as monthly_count_nymph
+FROM weather_monthly as a, nymph_monthly as r
+WHERE r.dates = a.dates
